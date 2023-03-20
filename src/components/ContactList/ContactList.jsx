@@ -7,8 +7,6 @@ export const ContactList = () => {
   const dispatch = useDispatch();
   const filteredContacts = useSelector(selectFilteredContacts);
 
-  // console.log('filter:', filter, 'items:', JSON.stringify.items);
-
   const deleteSelectedContact = id => {
     dispatch(deleteContact(id));
   };

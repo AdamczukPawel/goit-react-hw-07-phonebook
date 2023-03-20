@@ -28,7 +28,6 @@ export const ContactForm = () => {
 
     dispatch(addContact(contact));
     form.reset();
-    // localStorage.setItem('contacts', JSON.stringify([...contacts, contact]));
   };
 
   return (
