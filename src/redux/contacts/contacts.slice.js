@@ -1,50 +1,49 @@
-function loadFromLocalStorage() {
-  try {
-    const serialisedState = localStorage.getItem('persistantState');
-    if (serialisedState === null) return undefined;
-    return JSON.parse(serialisedState);
-  } catch (e) {
-    console.warn(e);
-    return undefined;
-  }
-}
-
-const preloadedState = loadFromLocalStorage();
+import { fetchContacts, addContact, deleteContact } from 'redux/operations';
 
 const { createSlice } = require('@reduxjs/toolkit');
 
-const initialContactsState =
-  preloadedState !== undefined ? preloadedState.contacts : [];
+const handlePending = state => {
+  state.isLoading = true;
+};
+
+const handleRejected = (state, action) => {
+  state.isLoading = false;
+  state.error = action.payload;
+};
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: initialContactsState,
-  reducers: {
-    addContactAction: {
-      reducer(state, action) {
-        state.push(action.payload);
-      },
-      prepare(contact) {
-        return {
-          payload: {
-            name: contact.name,
-            number: contact.number,
-            id: contact.id,
-          },
-        };
-      },
+  initialState: {
+    items: [],
+    isLoading: false,
+    error: null,
+  },
+  extraReducers: {
+    [fetchContacts.pending]: handlePending,
+    [fetchContacts.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.items = action.payload;
     },
-    deleteContactAction(state, action) {
-      const id = action.payload;
-      return state.filter(task => task.id !== id);
+    [fetchContacts.rejected]: handleRejected,
+    [addContact.pending]: handlePending,
+    [addContact.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      state.items.push(action.payload);
     },
-    setContactsAction(state, action) {
-      const localStorageContacts = action.payload;
-      return (state = localStorageContacts);
+    [addContact.rejected]: handleRejected,
+    [deleteContact.pending]: handlePending,
+    [deleteContact.fulfilled](state, action) {
+      state.isLoading = false;
+      state.error = null;
+      const index = state.items.findIndex(
+        contact => contact.id === action.payload.id
+      );
+      state.items.splice(index, 1);
     },
+    [deleteContact.rejected]: handleRejected,
   },
 });
 
-export const { addContactAction, deleteContactAction, setContactsAction } =
-  contactsSlice.actions;
 export const contactsReducer = contactsSlice.reducer;

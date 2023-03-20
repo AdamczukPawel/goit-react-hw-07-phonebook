@@ -2,12 +2,12 @@ import css from './ContactForm.module.css';
 import { nanoid } from 'nanoid';
 import swal from 'sweetalert';
 import { useDispatch, useSelector } from 'react-redux';
-import { addContactAction } from 'redux/contacts/contacts.slice';
-import { getContacts } from 'redux/selectors';
+import { addContact } from 'redux/operations';
+import { selectContacts } from 'redux/selectors';
 
 export const ContactForm = () => {
   const dispatch = useDispatch();
-  const contacts = useSelector(getContacts);
+  const contacts = useSelector(selectContacts);
 
   const handleSubmit = event => {
     event.preventDefault();
@@ -26,7 +26,7 @@ export const ContactForm = () => {
       return;
     }
 
-    dispatch(addContactAction(contact));
+    dispatch(addContact(contact));
     form.reset();
     // localStorage.setItem('contacts', JSON.stringify([...contacts, contact]));
   };
